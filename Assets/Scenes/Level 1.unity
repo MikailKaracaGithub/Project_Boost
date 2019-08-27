@@ -339,7 +339,7 @@ PrefabInstance:
     - target: {fileID: 2459125801401163560, guid: 1d5e531dbf3d6cf45ae6f9603643f04b,
         type: 3}
       propertyPath: Loop
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2459125801401163560, guid: 1d5e531dbf3d6cf45ae6f9603643f04b,
         type: 3}
@@ -350,6 +350,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pitch
       value: 1.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 2459125801401163560, guid: 1d5e531dbf3d6cf45ae6f9603643f04b,
+        type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4442636508143644591, guid: 1d5e531dbf3d6cf45ae6f9603643f04b,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d5e531dbf3d6cf45ae6f9603643f04b, type: 3}
