@@ -7,39 +7,59 @@ public class Rocket : MonoBehaviour
 {
     Rigidbody rb;
     AudioSource audioSource;
-    // Start is called before the first frame update
+
+      [SerializeField] float rcsThrust = 100f; // serializefield makes it public for the editor so its pretty handy
+      [SerializeField] float mainThrust = 100f;
+    
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
+   
     void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
+
     }
 
-    private void ProcessInput()
+    void OnCollisionEnter(Collision collision)
+    {
+        print("Collided");
+    }
+
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddRelativeForce(Vector3.up);
+           
+            rb.AddRelativeForce(Vector3.up * mainThrust);
             if (!audioSource.isPlaying)
-            { 
-            audioSource.Play();
+            {
+                audioSource.Play();
             }
             else
             {
                 audioSource.Stop();
             }
         }
-        if (Input.GetKey(KeyCode.A)){
-            transform.Rotate(Vector3.forward);
-        }else if (Input.GetKey(KeyCode.D))
+    }
+    private void Rotate()
+    {
+        rb.freezeRotation = true;
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+
+        if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(-Vector3.forward);
+            transform.Rotate(Vector3.forward * rotationThisFrame);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
 
         }
+        rb.freezeRotation = false;
     }
 }
