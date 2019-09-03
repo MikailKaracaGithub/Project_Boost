@@ -8,6 +8,7 @@ public class Rocket : MonoBehaviour
 
     [SerializeField] float rcsThrust = 100f; // serializefield makes it public for the editor so its pretty handy
     [SerializeField] float mainThrust = 100f;
+    [SerializeField] float levelLoadDelay = 2f;
 
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip death;
@@ -20,11 +21,14 @@ public class Rocket : MonoBehaviour
     enum State {  Alive, Dying, Transcending }
     State state = State.Alive;
 
+    bool collisionAreEnabled = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
         state = State.Alive;
+        
     }
 
    
@@ -35,11 +39,24 @@ public class Rocket : MonoBehaviour
             RespondToThrustInput();
             RespondToRotateInput();
         }
+        if (Debug.isDebugBuild) { 
+        RespondToDebugKeys();
+        }
     }
-
+    private void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextScene();
+        }else if (Input.GetKeyDown(KeyCode.C))
+        {
+            //toggle collision
+            collisionAreEnabled = !collisionAreEnabled; // toggle
+        }
+    }
     void OnCollisionEnter(Collision collision)
     {
-        if (state != State.Alive) { return; } //return leaves the function
+        if (state != State.Alive || collisionAreEnabled) { return; } //return leaves the function
         switch (collision.gameObject.tag)
         {
             case "Friendly":
@@ -60,7 +77,6 @@ public class Rocket : MonoBehaviour
 
         }
     }
-
     private void StartDeath()
     {
         state = State.Dying;
@@ -71,7 +87,7 @@ public class Rocket : MonoBehaviour
         deathParticles.Play();
 
 
-        Invoke("ResetLevel", 1f);
+        Invoke("ResetLevel", levelLoadDelay);
     }
 
     private void StartSuccess()
@@ -83,18 +99,29 @@ public class Rocket : MonoBehaviour
         audioSource.PlayOneShot(jingle);
 
         jingleParticles.Play();
-        Invoke("LoadNextScene", 1f);
-
+        Invoke("LoadNextScene", levelLoadDelay);
     }
 
     private void ResetLevel()
     {
-        SceneManager.LoadScene(0);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
+        {
+            nextSceneIndex = 0;
+        }
+        SceneManager.LoadScene(currentSceneIndex);
     }
 
     private void LoadNextScene()
     {
-        SceneManager.LoadScene(1);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
+        {
+            nextSceneIndex = 0;
+        }
+        SceneManager.LoadScene(nextSceneIndex);
     }
 
     private void RespondToThrustInput()
@@ -114,7 +141,7 @@ public class Rocket : MonoBehaviour
 
     private void ApplyThrust()
     {
-        rb.AddRelativeForce(Vector3.up * mainThrust);
+        rb.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
         if (!audioSource.isPlaying)
         {
             audioSource.PlayOneShot(mainEngine);
